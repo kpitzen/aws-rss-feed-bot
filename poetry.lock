@@ -271,7 +271,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 name = "boto3-stubs"
 version = "1.26.118"
 description = "Type annotations for boto3 1.26.118 generated with mypy-boto3-builder 7.14.5"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -655,7 +655,7 @@ crt = ["awscrt (==0.16.9)"]
 name = "botocore-stubs"
 version = "1.29.118"
 description = "Type annotations and code completion for botocore"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
@@ -1723,7 +1723,7 @@ telegram = ["requests"]
 name = "types-awscrt"
 version = "0.16.16"
 description = "Type annotations and code completion for awscrt"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
@@ -1762,7 +1762,7 @@ files = [
 name = "types-s3transfer"
 version = "0.6.0.post7"
 description = "Type annotations and code completion for s3transfer"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
@@ -1893,4 +1893,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "342a0a9f7c44fb9d8e12a41fd46dcc958d062bc066e3cf0a5a8af3b8141d215c"
+content-hash = "44fd3d8d7fc41293bde6b302af633ffc3b5f16518b1dd3a531f4352de8147c80"
