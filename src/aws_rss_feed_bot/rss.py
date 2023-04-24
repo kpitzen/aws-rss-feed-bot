@@ -1,6 +1,7 @@
 from typing import Optional
 
 import feedparser
+from bs4 import BeautifulSoup
 from pydantic import BaseModel
 
 from aws_rss_feed_bot import configuration
@@ -28,6 +29,14 @@ class RSSFeedClient:
     @property
     def latest(self) -> feedparser.FeedParserDict:
         return self._feed.entries[0]
+
+    @property
+    def latest_content(self) -> str:
+        return self.latest["content"][0]["value"]
+
+    @property
+    def latest_content_text(self) -> str:
+        return BeautifulSoup(self.latest_content, "html.parser").get_text()
 
 
 class RSSPublishInfo(BaseModel):
