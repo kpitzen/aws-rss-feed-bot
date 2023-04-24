@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "aws-feed-parser-infra"
+version = "0.1.0"
+description = ""
+authors = ["Kyle Pitzen <kpitzen@pulumi.com>"]
+readme = "README.md"
+packages = [{include = "aws_feed_parser_infra"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pulumi = ">=3.64.0"
+pulumi-aws-native = ">0.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

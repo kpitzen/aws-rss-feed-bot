@@ -1,0 +1,6 @@
+# Python specific ignores
+__pycache__
+.mypy_cache
+
+# Direnv
+.envrc
