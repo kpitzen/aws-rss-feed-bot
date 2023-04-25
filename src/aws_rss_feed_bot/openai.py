@@ -1,9 +1,9 @@
+import json
 import logging
-from typing import List, Optional
+from typing import Optional
 
 import openai
 import tiktoken
-from tqdm import tqdm
 
 from aws_rss_feed_bot import configuration
 
@@ -14,26 +14,39 @@ def get_max_tokens(content: str, model: str = "davinci", max_tokens: int = 512):
 
 
 def format_summary_response(response: str) -> str:
-    return response.strip().replace("\n", " ").replace("  ", " ").replace('"', "")
+    return response.strip().replace("'", '"')
 
 
 class OpenAIClient:
     config: configuration.Configuration
-    summary_prompt = """
-    Please summarize the following paragraph as if you were a senior software engineer
-    Your summary should be between 2 and 4 sentences in length.
-    Paragraph: \"{paragraph}\"
-    Summary:"""
-    base_prompt = """
+    system_prompt = """
     You are a senior software engineer at a company which builds
     automation tools for provisioning infrastructure on AWS. You are tasked with writing a
     summary about how the announcements in the content below affects your company's
-    technology. This summary should be between 1 and 3 sentences in length for each change, and should be focused
-    on whether or the announcement is a net-new feature or a breaking change for the company's product.
-    Please provide your analysis in the form of a bulleted list with a corresponding percentage representing
-    your confidence for each.
+    technology. This summary should be between a single sentence in length for each change, and should be limited
+    to whether or the announcement is a net-new feature or a breaking change for the company's product.
+    Your analysis should be in the form of a valid JSON object containing a list of objects in the form:
+    "summary": string containing a plain-text version of your analysis
+    "breaking": boolean describing whether this change is breaking for us or not
+    "confidence": percentage representing your confidence in this analysis"""
+    user_prompt = """
+    Please analyze the following content:
     Content: \"{content}\"
-    Analysis:"""
+    """
+    cleanup_prompt = """
+    You are a software engineer.
+    You have been tasked with modifying the following content so that it is syntactically correct JSON,
+    but not to alter the structure JSON objects which result. Your modifications should be
+    limited to ensuring strings are encapsulated with double quotes and other things which
+    would otherwise be caught by automated JSON validation tooling. You may add attributes as you
+    find necessary, but do not remove any existing attributes.
+    Your analysis should be in the form of a valid JSON object containing a list of objects in the form:
+    "summary": string containing a plain-text version of your analysis
+    "breaking": boolean describing whether this change is breaking for us or not
+    "confidence": percentage representing your confidence in this analysis"""
+    cleanup_user_prompt = """
+    Please proceed with modifications on the following content:
+    Content: \"{content}\""""
 
     def __init__(self, config: Optional[configuration.Configuration] = None):
         self.log = logging.getLogger(__name__)
@@ -50,48 +63,49 @@ class OpenAIClient:
             self.config = config
         openai.api_key = self.config.openai_config.api_key
 
-    def summarize(self, content: List[str]):
+    def summarize(self, content: str):
         log = self.log.getChild("summarize")
-        summary_responses = []
-        log.info("Summarizing content...")
-        for paragraph in tqdm(content, "Paragraphs: ", disable=self.config.disable_tty):
-            summary_prompt = self.summary_prompt.format(
-                paragraph=paragraph,
-            ).strip()
-            log.debug(summary_prompt)
-            summary_response = self.openai.Completion.create(
-                engine="davinci",
-                prompt=summary_prompt,
-                temperature=0.1,
-                max_tokens=get_max_tokens(summary_prompt),
-                frequency_penalty=1.0,
-                presence_penalty=0.5,
-                stop=["\n\n", "\n"],
-            )
-            log.debug(summary_response)
-            if summary_response["choices"][0]["finish_reason"] == "length":
-                raise RuntimeError(
-                    "Summary was too long and OpenAI returned an incorrect response."
-                )
-            summary_responses.append(summary_response.choices[0]["text"])
-        cleaned_summary_responses = " ".join(
-            [
-                format_summary_response(summary_response)
-                for summary_response in summary_responses
-            ]
-        )
-        analysis_prompt = self.base_prompt.format(
-            content=cleaned_summary_responses
-        ).strip()
-        log.debug(analysis_prompt)
-        log.info("Analyzing summary...")
-        analysis_response = self.openai.Completion.create(
-            engine="davinci",
-            prompt=analysis_prompt,
+        user_prompt = self.user_prompt.format(content=content)
+        log.debug("System Prompt:", self.system_prompt)
+        log.debug("User Prompt:", user_prompt)
+        log.info("Analyzing blog post...")
+        analysis_response = self.openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
             temperature=0.1,
-            frequency_penalty=1.0,
-            presence_penalty=0.5,
-            max_tokens=get_max_tokens(analysis_prompt),
         )
-        log.debug(analysis_response)
-        return analysis_response["choices"][0]["text"]
+        structured_response = analysis_response["choices"][0]["message"]["content"]
+        try:
+            return_value = json.loads(structured_response)
+            return return_value
+        except json.decoder.JSONDecodeError:
+            try:
+                log.debug(structured_response)
+                cleaned_up_response = self.openai.ChatCompletion.create(
+                    model="gpt-4",
+                    messages=[
+                        {"role": "system", "content": self.cleanup_prompt},
+                        {
+                            "role": "user",
+                            "content": self.cleanup_user_prompt.format(
+                                content=structured_response
+                            ),
+                        },
+                    ],
+                    temperature=0.1,
+                )
+                log.debug(cleaned_up_response["choices"][0]["message"]["content"])
+                return json.loads(
+                    format_summary_response(
+                        cleaned_up_response["choices"][0]["message"]["content"]
+                    )
+                )
+            except Exception as e:
+                log.exception(e)
+                raise e
+        except Exception as e:
+            log.exception(e)
+            raise e

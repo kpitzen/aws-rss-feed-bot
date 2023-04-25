@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 import feedparser
 from bs4 import BeautifulSoup
@@ -35,11 +35,13 @@ class RSSFeedClient:
         return self.latest["content"][0]["value"]
 
     @property
-    def latest_content_text(self) -> List[str]:
+    def latest_content_text(self) -> str:
         text_content = (
-            BeautifulSoup(self.latest_content, "html.parser").get_text().split("\n")
+            BeautifulSoup(self.latest_content, "html.parser").get_text().split("\n\n")
         )
-        return [paragraph.strip() for paragraph in text_content if paragraph.strip()]
+        return "\n".join(
+            [paragraph.strip() for paragraph in text_content if paragraph.strip()]
+        )
 
 
 class RSSPublishInfo(BaseModel):
