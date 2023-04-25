@@ -1,4 +1,5 @@
 import os
+from distutils.util import strtobool
 from typing import Optional
 
 
@@ -37,11 +38,14 @@ class AWSRSSConfig:
 
 class Configuration:
     openai_config: OpenAIConfig
+    aws_rss_config: AWSRSSConfig
+    disable_tty: bool = False
 
     def __init__(
         self,
         openai_config: Optional[OpenAIConfig] = None,
         aws_rss_config: Optional[AWSRSSConfig] = None,
+        disable_tty: Optional[bool] = None,
     ):
         if openai_config:
             self.openai_config = openai_config
@@ -51,3 +55,7 @@ class Configuration:
             self.aws_rss_config = aws_rss_config
         else:
             self.aws_rss_config = AWSRSSConfig()
+        if disable_tty is not None:
+            self.disable_tty = disable_tty
+        else:
+            self.disable_tty = bool(strtobool(os.environ.get("DISABLE_TTY", "False")))
