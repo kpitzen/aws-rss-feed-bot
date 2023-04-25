@@ -25,7 +25,8 @@ class OpenAIClient:
     summary about how the announcements in the content below affects your company's
     technology. This summary should be between a single sentence in length for each change, and should be limited
     to whether or the announcement is a net-new feature or a breaking change for the company's product.
-    Your analysis should be in the form of a valid JSON object containing a list of objects in the form:
+    Your analysis should be in the form of a valid JSON object with a top level key called "changes"
+    which contains a list of objects in the form:
     "summary": string containing a plain-text version of your analysis
     "breaking": boolean describing whether this change is breaking for us or not
     "confidence": percentage representing your confidence in this analysis"""

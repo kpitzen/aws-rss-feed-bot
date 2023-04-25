@@ -3,6 +3,7 @@ from typing import Optional
 import feedparser
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
+import requests
 
 from aws_rss_feed_bot import configuration
 
@@ -32,7 +33,8 @@ class RSSFeedClient:
 
     @property
     def latest_content(self) -> str:
-        return self.latest["content"][0]["value"]
+        response = requests.get(self.latest["link"])
+        return response.text
 
     @property
     def latest_content_text(self) -> str:
