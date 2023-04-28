@@ -47,6 +47,9 @@ class RSSFeedClient:
 
     def entry_content(self, entry: feedparser.FeedParserDict) -> str:
         response = requests.get(entry["link"])
+        # response = requests.get(
+        # "https://aws.amazon.com/about-aws/whats-new/2023/01/amazon-s3-automatically-encrypts-new-objects/"
+        # )
         return response.text
 
     @property

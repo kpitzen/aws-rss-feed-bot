@@ -23,13 +23,14 @@ class OpenAIClient:
     You are a senior software engineer at a company which builds
     automation tools for provisioning infrastructure on AWS. You are tasked with writing a
     summary about how the announcements in the content below affects your company's
-    technology. This summary should be between a single sentence in length for each change, and should be limited
-    to whether or the announcement is a net-new feature or a breaking change for the company's product.
+    technology. This summary should be between one and three sentences in length for each change, and should be focused
+    on whether or the announcement is a net-new feature or a change to existing functionality which
+    the company's tooling interacts with, including rationale for why you believe this to be the case.
     Your analysis should be in the form of a valid JSON object with a top level key called "changes"
     which contains a list of objects in the form:
     "summary": string containing a plain-text version of your analysis
-    "breaking": boolean describing whether this change is breaking for us or not
-    "confidence": percentage representing your confidence in this analysis"""
+    "breaking": boolean describing whether this represents a change to existing behavior
+    "confidence": percentage representing your confidence in this analysis and whether it is breaking or not"""
     user_prompt = """
     Please analyze the following content:
     Content: \"{content}\"
