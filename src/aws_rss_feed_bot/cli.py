@@ -10,17 +10,24 @@ from aws_rss_feed_bot import openai, rss, s3
 @click.option(
     "--verbosity", "-v", default="INFO", type=click.Choice(["DEBUG", "INFO", "WARNING"])
 )
-def main(checkpoint: bool, verbosity: str):
+@click.option(
+    "--lookback",
+    "-l",
+    default=1,
+    type=click.IntRange(1, 20),
+    help="Number of posts to look back on",
+)
+def main(checkpoint: bool, verbosity: str, lookback: int):
     logging.basicConfig(level=verbosity)
     log = logging.getLogger(__name__)
-    # openapi_client = client.OpenAPIClient()
     s3_client = s3.AWSS3Client()
     rss_client = rss.RSSFeedClient()
     openai_client = openai.OpenAIClient()
     publish_info = s3_client.get_latest_publish_info()
-    latest_rss = rss_client.latest_content_text
-    summary = openai_client.summarize(latest_rss)
-    log.info(summary)
+    for entry in rss_client.entries[:lookback]:
+        log.info(f"Post link: {entry['link']}")
+        summary = openai_client.summarize(rss_client.cleaned_entry(entry))
+        log.info(summary)
 
     log.debug(publish_info)
     if checkpoint:

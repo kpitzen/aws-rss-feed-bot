@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import List, Optional
 
 import feedparser
+import requests
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
-import requests
 
 from aws_rss_feed_bot import configuration
 
@@ -30,6 +30,24 @@ class RSSFeedClient:
     @property
     def latest(self) -> feedparser.FeedParserDict:
         return self._feed.entries[0]
+
+    @property
+    def entries(self) -> List[feedparser.FeedParserDict]:
+        return self._feed.entries
+
+    def cleaned_entry(self, entry):
+        text_content = (
+            BeautifulSoup(self.entry_content(entry), "html.parser")
+            .get_text()
+            .split("\n\n")
+        )
+        return "\n".join(
+            [paragraph.strip() for paragraph in text_content if paragraph.strip()]
+        )
+
+    def entry_content(self, entry: feedparser.FeedParserDict) -> str:
+        response = requests.get(entry["link"])
+        return response.text
 
     @property
     def latest_content(self) -> str:
