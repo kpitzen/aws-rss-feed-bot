@@ -40,12 +40,16 @@ class Configuration:
     openai_config: OpenAIConfig
     aws_rss_config: AWSRSSConfig
     disable_tty: bool = False
+    slack_token: str = ""
+    slack_channel: str = ""
 
     def __init__(
         self,
         openai_config: Optional[OpenAIConfig] = None,
         aws_rss_config: Optional[AWSRSSConfig] = None,
         disable_tty: Optional[bool] = None,
+        slack_token: Optional[str] = None,
+        slack_channel: Optional[str] = None,
     ):
         if openai_config:
             self.openai_config = openai_config
@@ -59,3 +63,11 @@ class Configuration:
             self.disable_tty = disable_tty
         else:
             self.disable_tty = bool(strtobool(os.environ.get("DISABLE_TTY", "False")))
+        if slack_token:
+            self.slack_token = slack_token
+        else:
+            self.slack_token = os.environ.get("SLACK_BOT_TOKEN", "")
+        if slack_channel:
+            self.slack_channel = slack_channel
+        else:
+            self.slack_channel = os.environ.get("SLACK_BOT_CHANNEL", "")

@@ -17,6 +17,7 @@ click = "^8.1.3"
 beautifulsoup4 = "^4.12.2"
 tiktoken = "^0.3.3"
 tqdm = "^4.65.0"
+slack-sdk = "^3.21.3"
 
 [tool.poetry.scripts]
 cli = "aws_rss_feed_bot.cli:main"
