@@ -89,7 +89,7 @@ lambda_policy_document = bucket.arn.apply(
             "Statement": [
                 {
                     "Sid": "Stmt1683230189332",
-                    "Action": ["s3:ListBucket", "s3:PutObject"],
+                    "Action": ["s3:ListBucket", "s3:PutObject", "s3:GetObject"],
                     "Effect": "Allow",
                     "Resource": f"{bucket_arn}/*",
                 }

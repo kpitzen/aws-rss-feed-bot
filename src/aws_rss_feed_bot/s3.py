@@ -4,7 +4,6 @@ import logging
 from typing import Optional
 
 import boto3
-import botocore
 import pendulum
 
 from aws_rss_feed_bot import configuration, rss
@@ -28,12 +27,9 @@ class AWSS3Client:
     def get_latest_publish_info(self):
         buffer = io.BytesIO()
         s3 = boto3.client("s3")
-        try:
-            s3.download_fileobj(
-                self.config.aws_rss_config.bucket_name, self.publish_filepath, buffer
-            )
-        except botocore.exceptions.ClientError:
-            return rss.RSSPublishInfo(published="2021-01-01T00:00:00Z")
+        s3.download_fileobj(
+            self.config.aws_rss_config.bucket_name, self.publish_filepath, buffer
+        )
         buffer.seek(0)
         return rss.RSSPublishInfo.parse_obj(json.loads(buffer.read().decode("utf-8")))
 
