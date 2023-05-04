@@ -38,7 +38,7 @@ module = "feedparser.*"
 ignore_missing_imports = true
 
 [tool.mypy]
-exclude = "^pulumi"
+exclude = ["^pulumi", "dist"]
 
 [build-system]
 requires = ["poetry-core"]

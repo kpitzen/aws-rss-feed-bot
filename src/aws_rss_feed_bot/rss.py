@@ -1,11 +1,28 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import feedparser
+import pendulum
 import requests
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
 
 from aws_rss_feed_bot import configuration
+
+
+class RSSPublishInfo(BaseModel):
+    published: Union[pendulum.DateTime, pendulum.Date, pendulum.Time, pendulum.Duration]
+    title: str = ""
+    link: str = ""
+    summary: str = ""
+
+    @classmethod
+    def from_entry(cls, entry: feedparser.FeedParserDict):
+        return cls(
+            published=pendulum.parse(entry["published"], strict=False),
+            title=entry["title"],
+            link=entry["link"],
+            summary=entry["summary"],
+        )
 
 
 class RSSFeedClient:
@@ -33,7 +50,10 @@ class RSSFeedClient:
 
     @property
     def entries(self) -> List[feedparser.FeedParserDict]:
-        return self._feed.entries
+        return [
+            {**entry, "published": pendulum.parse(entry["published"], strict=False)}
+            for entry in self._feed.entries
+        ]
 
     def cleaned_entry(self, entry):
         text_content = (
@@ -47,10 +67,19 @@ class RSSFeedClient:
 
     def entry_content(self, entry: feedparser.FeedParserDict) -> str:
         response = requests.get(entry["link"])
-        # response = requests.get(
-        # "https://aws.amazon.com/about-aws/whats-new/2023/01/amazon-s3-automatically-encrypts-new-objects/"
-        # )
         return response.text
+
+    def entries_to_load(
+        self, previous_publish_info: Optional[RSSPublishInfo] = None, lookback: int = 1
+    ):
+        published_date = (
+            previous_publish_info.published
+            if previous_publish_info
+            else pendulum.parse("2021-01-01T00:00:00Z")
+        )
+        return [entry for entry in self.entries if entry["published"] > published_date][
+            :lookback
+        ]
 
     @property
     def latest_content(self) -> str:
@@ -65,10 +94,3 @@ class RSSFeedClient:
         return "\n".join(
             [paragraph.strip() for paragraph in text_content if paragraph.strip()]
         )
-
-
-class RSSPublishInfo(BaseModel):
-    published: str
-    title: str = ""
-    link: str = ""
-    summary: str = ""
