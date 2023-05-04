@@ -45,7 +45,7 @@ def run_summaries(
             continue
         else:
             if entry["published"] > new_publish_info.published:
-                new_publish_info = rss.RSSPublishInfo(published=entry["published"])
+                new_publish_info = rss.RSSPublishInfo.from_entry(entry)
         log.info(f"Post link: {entry['link']}")
         summary = openai_client.summarize(rss_client.cleaned_entry(entry))
         log.debug(summary)

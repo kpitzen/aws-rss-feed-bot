@@ -40,7 +40,6 @@ ecr_repo = aws.ecr.Repository(
 auth_token = aws.ecr.get_authorization_token_output(ecr_repo.registry_id)
 ecr = boto3.client("ecr")
 images = ecr_repo.name.apply(lambda name: ecr.list_images(repositoryName=name))
-parsed_tags = []
 tags = images.apply(
     lambda images: [item.get("imageTag", -1) for item in images["imageIds"]]
 )
