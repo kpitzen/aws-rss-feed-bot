@@ -1,6 +1,5 @@
 """An AWS Python Pulumi program"""
 
-import hashlib
 import json
 import os
 

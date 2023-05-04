@@ -50,10 +50,14 @@ class RSSFeedClient:
 
     @property
     def entries(self) -> List[feedparser.FeedParserDict]:
-        return [
-            {**entry, "published": pendulum.parse(entry["published"], strict=False)}
-            for entry in self._feed.entries
-        ]
+        entries = sorted(
+            [
+                {**entry, "published": pendulum.parse(entry["published"], strict=False)}
+                for entry in self._feed.entries
+            ],
+            key=lambda entry: entry["published"],
+        )
+        return entries
 
     def cleaned_entry(self, entry):
         text_content = (
@@ -78,7 +82,7 @@ class RSSFeedClient:
             else pendulum.parse("2021-01-01T00:00:00Z")
         )
         return [entry for entry in self.entries if entry["published"] > published_date][
-            :lookback
+            len(self.entries) - lookback :
         ]
 
     @property
