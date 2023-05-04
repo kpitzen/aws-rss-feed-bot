@@ -112,6 +112,13 @@ lambda_function = aws.lambda_.Function(
     timeout=500,
 )
 
+cloudwatch_event = aws.cloudwatch.EventRule(
+    "aws-rss-feed-bot-event", schedule_expression="rate(1 hour)"
+)
+event_target = aws.cloudwatch.EventTarget(
+    "aws-rss-feed-bot-event-target", rule=cloudwatch_event.name, arn=lambda_function.arn
+)
+
 # Export the name of the bucket
 pulumi.export("image_name", docker_image.image_name)
 pulumi.export("lambda_arn", lambda_function.arn)
