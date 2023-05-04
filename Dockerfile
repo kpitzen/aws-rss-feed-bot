@@ -32,6 +32,7 @@ RUN pip install poetry
 
 WORKDIR /app
 ADD pyproject.toml poetry.lock /app/
+ADD bin/aws-lambda-rie-x86_64 /usr/local/bin/aws-lambda-rie
 
 RUN poetry config virtualenvs.create false \
   && poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi --no-root
@@ -40,4 +41,5 @@ ADD . /app
 
 RUN poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
 
-ENTRYPOINT [ "poetry", "run" ]
+ENTRYPOINT ["./scripts/entrypoint.sh"]
+CMD ["aws_rss_feed_bot.handler.handler"]

@@ -19,7 +19,7 @@ dist: src/aws_rss_feed_bot lock
 	poetry export -o dist/requirements.txt --without-hashes
 	pip install -r dist/requirements.txt -t dist/
 
-docker-build: dist
+docker-build:
 	docker build -t aws-rss-feed-bot \
 	  --build-arg OPENAI_API_KEY=${OPENAI_API_KEY} \
 	  --build-arg SLACK_BOT_CHANNEL=${SLACK_BOT_CHANNEL} \
