@@ -18,7 +18,7 @@ class RSSPublishInfo(BaseModel):
     @classmethod
     def from_entry(cls, entry: feedparser.FeedParserDict):
         return cls(
-            published=pendulum.parse(entry["published"], strict=False),
+            published=entry["published"],
             title=entry["title"],
             link=entry["link"],
             summary=entry["summary"],
