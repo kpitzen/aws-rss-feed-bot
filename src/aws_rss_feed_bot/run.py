@@ -38,14 +38,20 @@ def run_summaries(
     if not rss_client.entries_to_load(publish_info, lookback):
         log.info("No new posts to summarize")
         return
-
+    new_publish_info = publish_info
     for entry in rss_client.entries_to_load(publish_info, lookback):
+        log.info(f"Post published: {entry['published']}")
+        if entry["published"] <= publish_info.published:
+            continue
+        else:
+            if entry["published"] > new_publish_info.published:
+                new_publish_info = rss.RSSPublishInfo(
+                    published=entry["published"]
+                )
         log.info(f"Post link: {entry['link']}")
         summary = openai_client.summarize(rss_client.cleaned_entry(entry))
         log.debug(summary)
         summaries.append(utils.merge_post_with_summary(entry, summary))
-
-    new_publish_info = rss.RSSPublishInfo.from_entry(rss_client.latest)
 
     log.debug(new_publish_info)
     if checkpoint:

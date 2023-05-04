@@ -2,5 +2,5 @@ name: aws-feed-parser
 runtime:
   name: python
   options:
-    virtualenv: /Users/kylepitzen/Library/Caches/pypoetry/virtualenvs/openai-tutorial-9pIAaRA4-py3.10
+    virtualenv: /Users/kylepitzen/Library/Caches/pypoetry/virtualenvs/aws-rss-feed-bot-JLlDTDeK-py3.10
 description: A set of pulumi infra to parse aws blog feeds

@@ -41,5 +41,5 @@ ADD . /app
 
 RUN poetry install $(test "$YOUR_ENV" == production && echo "--no-dev") --no-interaction --no-ansi
 
-ENTRYPOINT ["./scripts/entrypoint.sh"]
+ENTRYPOINT ["/app/scripts/entrypoint.sh"]
 CMD ["aws_rss_feed_bot.handler.handler"]

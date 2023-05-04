@@ -1,3 +1,15 @@
+# AWS Config
+export AWS_RSS_URL=https://aws.amazon.com/about-aws/whats-new/recent/feed/
+export AWS_S3_BUCKET_NAME=
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
 export AWS_SESSION_TOKEN=
+
+# OpenAI Config
+# Do not share your OpenAI API key with anyone! It should remain a secret.
+export OPENAI_API_KEY=
+
+# Slack Bot Config
+export SLACK_BOT_TOKEN=
+export SLACK_BOT_WEBHOOK=
+export SLACK_BOT_CHANNEL=
