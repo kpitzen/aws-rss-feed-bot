@@ -68,8 +68,8 @@ class OpenAIClient:
     def summarize(self, content: str):
         log = self.log.getChild("summarize")
         user_prompt = self.user_prompt.format(content=content)
-        log.debug("System Prompt:", self.system_prompt)
-        log.debug("User Prompt:", user_prompt)
+        log.debug(f"System Prompt: {self.system_prompt}")
+        log.debug(f"User Prompt: {user_prompt}")
         log.info("Analyzing blog post...")
         analysis_response = self.openai.ChatCompletion.create(
             model="gpt-4",
