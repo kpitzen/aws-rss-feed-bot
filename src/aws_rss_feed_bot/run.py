@@ -49,7 +49,7 @@ def run_summaries(
                 new_publish_info = rss.RSSPublishInfo.from_entry(entry)
         log.info(f"Post link: {entry['link']}")
         summary = openai_client.summarize(rss_client.cleaned_entry(entry))
-        log.debug(summary)
+        log.info(f"Summary of post: {summary}")
         summaries.append(utils.merge_post_with_summary(entry, summary))
 
     log.debug(new_publish_info)

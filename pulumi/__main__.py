@@ -102,6 +102,13 @@ lambda_role_policy = aws.iam.RolePolicy(
     "aws-rss-feed-bot-role-policy", policy=lambda_policy_document, role=lambda_role.name
 )
 
+base_lambda_execution_policy = aws.iam.get_policy(name="AWSLambdaBasicExecutionRole")
+policy_attackment = aws.iam.PolicyAttachment(
+    "aws-rss-feed-bot-lambda-policy-attachment",
+    roles=[lambda_role.name],
+    policy_arn=base_lambda_execution_policy.arn,
+)
+
 
 lambda_function = aws.lambda_.Function(
     "aws-rss-feed-bot-lambda",
