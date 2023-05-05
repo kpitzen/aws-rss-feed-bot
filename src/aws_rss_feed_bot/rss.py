@@ -81,9 +81,10 @@ class RSSFeedClient:
             if previous_publish_info
             else pendulum.parse("2021-01-01T00:00:00Z")
         )
-        return [entry for entry in self.entries if entry["published"] > published_date][
-            len(self.entries) - lookback :
+        entries = [
+            entry for entry in self.entries if entry["published"] > published_date
         ]
+        return entries[-lookback:]
 
     @property
     def latest_content(self) -> str:

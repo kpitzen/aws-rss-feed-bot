@@ -35,11 +35,12 @@ def run_summaries(
         log.info(
             f"Using default publish info to determine posts to summarize since {publish_info.published}"
         )
-    if not rss_client.entries_to_load(publish_info, lookback):
+    entries_to_load = rss_client.entries_to_load(publish_info, lookback)
+    if not entries_to_load:
         log.info("No new posts to summarize")
         return
     new_publish_info = publish_info
-    for entry in rss_client.entries_to_load(publish_info, lookback):
+    for entry in entries_to_load:
         log.info(f"Post published: {entry['published']}")
         if entry["published"] <= publish_info.published:
             continue
@@ -54,7 +55,7 @@ def run_summaries(
     log.debug(new_publish_info)
     if checkpoint:
         log.info("Checkpointing...")
-        s3_client.checkpoint(new_publish_info)
+        # s3_client.checkpoint(new_publish_info)
     if slack_publish:
         log.info("Sending to Slack...")
         slack_client = slack.SlackClient()
